@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truficas del Río Pilas — Panel de gestión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & VARS ─── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gd:#1C3829;--gm:#2D5A3D;--gl:#E4EFE8;
+  --gold:#9A6F30;--goldb:#F5EDD9;
+  --ink:#1A1A18;--muted:#6B7169;--rule:#D8DBD5;
+  --bg:#F5F3EF;--surface:#FFFFFF;--surface2:#F0EDE7;
+  --red:#B03020;--redb:#FDECEA;
+  --amber:#7A5010;--amberb:#FDF3E0;
+  --radius:10px;--radius-sm:6px;
+  --sidebar:240px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;min-height:100vh}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px}
+h1,h2,h3{font-weight:500}
+
+/* ─── LOGIN ─── */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:var(--gd);
+}
+.login-box{
+  background:var(--surface);border-radius:16px;
+  padding:40px;width:360px;
+}
+.login-logo{
+  font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gd);
+  text-align:center;margin-bottom:4px;
+}
+.login-logo span{display:block;font-size:11px;font-weight:400;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  font-family:'DM Sans',sans-serif;margin-top:4px}
+.login-rule{height:1px;background:var(--rule);margin:20px 0}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;font-size:12px;font-weight:500;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.login-field input{
+  width:100%;padding:10px 12px;border:1px solid var(--rule);
+  border-radius:var(--radius-sm);font-size:14px;color:var(--ink);
+  outline:none;transition:border-color .15s;background:var(--bg);
+}
+.login-field input:focus{border-color:var(--gm)}
+.login-btn{
+  width:100%;padding:11px;background:var(--gd);color:#fff;
+  border:none;border-radius:var(--radius-sm);font-size:14px;
+  font-weight:500;transition:background .15s;margin-top:4px;
+}
+.login-btn:hover{background:var(--gm)}
+.login-error{
+  background:var(--redb);color:var(--red);font-size:13px;
+  padding:8px 12px;border-radius:var(--radius-sm);margin-top:12px;display:none;
+}
+
+/* ─── APP SHELL ─── */
+#app{display:none;min-height:100vh}
+
+/* ─── SIDEBAR ─── */
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:var(--sidebar);
+  background:var(--gd);display:flex;flex-direction:column;z-index:200;
+}
+.sb-brand{padding:22px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-brandname{
+  font-family:'Cormorant Garamond',serif;font-size:17px;color:#fff;line-height:1.2}
+.sb-brandsub{font-size:10px;color:rgba(255,255,255,.4);
+  text-transform:uppercase;letter-spacing:.09em;margin-top:3px}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-section{font-size:9px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.1em;color:rgba(255,255,255,.3);padding:16px 10px 6px}
+.sb-item{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:var(--radius-sm);color:rgba(255,255,255,.65);
+  font-size:13px;cursor:pointer;transition:all .15s;margin-bottom:2px;
+  border:none;background:transparent;width:100%;text-align:left;
+}
+.sb-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.sb-item.active{background:rgba(255,255,255,.13);color:#fff}
+.sb-item .ic{
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.sb-bottom{
+  padding:14px 8px;border-top:1px solid rgba(255,255,255,.08);
+}
+.sb-user{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:4px;
+}
+.sb-avatar{
+  width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+  font-weight:500;color:#fff;flex-shrink:0;
+}
+.sb-username{font-size:12px;color:rgba(255,255,255,.8)}
+.sb-role{font-size:10px;color:rgba(255,255,255,.4)}
+.sb-logout{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  color:rgba(255,255,255,.5);font-size:12px;cursor:pointer;
+  border:none;background:transparent;width:100%;border-radius:var(--radius-sm);
+  transition:all .15s;
+}
+.sb-logout:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8)}
+
+/* ─── MAIN CONTENT ─── */
+.main{margin-left:var(--sidebar);min-height:100vh}
+.topbar{
+  background:var(--surface);border-bottom:1px solid var(--rule);
+  padding:0 28px;height:56px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;
+}
+.topbar-title{font-size:15px;font-weight:500;color:var(--ink)}
+.topbar-sub{font-size:12px;color:var(--muted)}
+.topbar-actions{display:flex;gap:8px}
+.content{padding:28px}
+
+/* ─── BUTTONS ─── */
+.btn{
+  padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;
+  font-weight:500;border:1px solid var(--rule);background:var(--surface);
+  color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;
+  align-items:center;gap:6px;
+}
+.btn:hover{background:var(--surface2);border-color:#bbb}
+.btn-primary{background:var(--gd);color:#fff;border-color:var(--gd)}
+.btn-primary:hover{background:var(--gm);border-color:var(--gm)}
+.btn-danger{background:var(--redb);color:var(--red);border-color:#f0c0bc}
+.btn-danger:hover{background:#fbd8d5;border-color:var(--red)}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-gold{background:var(--goldb);color:var(--gold);border-color:#e8d5b0}
+.btn-gold:hover{background:#ede0c4}
+
+/* ─── CARDS & GRID ─── */
+.card{
+  background:var(--surface);border:1px solid var(--rule);
+  border-radius:var(--radius);
+}
+.card-header{
+  padding:16px 20px;border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.card-body{padding:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+
+/* ─── METRICS ─── */
+.metric{
+  background:var(--surface);border:1px solid var(--rule);
+  border-radius:var(--radius);padding:16px 18px;
+}
+.metric-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);font-weight:500;margin-bottom:6px}
+.metric-value{font-size:26px;font-weight:500;color:var(--ink);line-height:1}
+.metric-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* ─── BADGE ─── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;font-size:11px;
+  font-weight:500;padding:3px 9px;border-radius:999px;
+}
+.badge-green{background:var(--gl);color:var(--gm)}
+.badge-amber{background:var(--amberb);color:var(--amber)}
+.badge-red{background:var(--redb);color:var(--red)}
+.badge-gray{background:var(--surface2);color:var(--muted)}
+
+/* ─── LABEL ─── */
+.field-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);font-weight:500;margin-bottom:5px}
+
+/* ─── TABLE ─── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--rule)}
+th{text-align:left;font-size:11px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--muted);padding:10px 12px}
+td{padding:12px 12px;font-size:13px;border-bottom:.5px solid var(--rule);
+  vertical-align:middle;color:var(--ink)}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg)}
+
+/* ─── FORM ─── */
+.form-field{margin-bottom:14px}
+.form-field label{display:block;font-size:12px;font-weight:500;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.form-field input,.form-field select,.form-field textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--rule);
+  border-radius:var(--radius-sm);font-size:13px;color:var(--ink);
+  outline:none;transition:border-color .15s;background:var(--surface);
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{
+  border-color:var(--gm);
+}
+.form-field textarea{resize:vertical;min-height:70px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ─── MODAL ─── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;
+  display:none;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surface);border-radius:var(--radius);width:600px;
+  max-width:95vw;max-height:90vh;display:flex;flex-direction:column;
+}
+.modal-header{
+  padding:18px 22px;border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-title{font-size:16px;font-weight:500}
+.modal-close{
+  background:none;border:none;font-size:20px;color:var(--muted);
+  cursor:pointer;padding:2px 6px;border-radius:4px;line-height:1;
+}
+.modal-close:hover{background:var(--surface2)}
+.modal-body{padding:22px;overflow-y:auto;flex:1}
+.modal-footer{
+  padding:14px 22px;border-top:1px solid var(--rule);
+  display:flex;justify-content:flex-end;gap:8px;
+}
+
+/* ─── PRINT ─── */
+@media print{
+  body{background:#fff!important}
+  .sidebar,.topbar,.no-print,.modal-overlay{display:none!important}
+  .main{margin-left:0!important}
+  .content{padding:0!important}
+  .print-card{
+    border:1px solid #ddd!important;border-radius:8px!important;
+    padding:24px!important;page-break-inside:avoid!important;
+    margin-bottom:24px!important;
+  }
+}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--gd);color:#fff;
+  padding:12px 18px;border-radius:var(--radius-sm);font-size:13px;
+  z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ─── UTILS ─── */
+.flex{display:flex}.items-center{align-items:center}.gap-2{gap:8px}
+.gap-3{gap:12px}.justify-between{justify-content:space-between}
+.mb-4{margin-bottom:16px}.mb-3{margin-bottom:12px}.mb-2{margin-bottom:8px}
+.mt-4{margin-top:16px}.text-muted{color:var(--muted)}
+.text-sm{font-size:12px}.text-xs{font-size:11px}
+.font-serif{font-family:'Cormorant Garamond',serif}
+.divider{height:1px;background:var(--rule);margin:16px 0}
+.tag-fab-propia{display:inline-flex;align-items:center;gap:4px;font-size:11px;
+  font-weight:500;padding:3px 9px;border-radius:999px;
+  background:#E4EFE8;color:#2D5A3D}
+.tag-fab-externo{display:inline-flex;align-items:center;gap:4px;font-size:11px;
+  font-weight:500;padding:3px 9px;border-radius:999px;
+  background:var(--amberb);color:var(--amber)}
+.section-gap{margin-bottom:24px}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state .es-icon{font-size:32px;margin-bottom:12px;opacity:.4}
+.stock-bar{height:6px;border-radius:3px;background:var(--rule);overflow:hidden}
+.stock-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      Truficas del Río Pilas
+      <span>Panel de gestión</span>
+    </div>
+    <div class="login-rule"></div>
+    <div class="login-field">
+      <label>Usuario</label>
+      <input type="text" id="login-user" placeholder="usuario" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos</div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brandname">Truficas del Río Pilas</div>
+      <div class="sb-brandsub">Panel de gestión</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <button class="sb-item active" onclick="showView('dashboard',this)">
+        <span class="ic">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+        </span>
+        Dashboard
+      </button>
+      <div class="sb-section">Catálogo</div>
+      <button class="sb-item" onclick="showView('fichas',this)">
+        <span class="ic">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </span>
+        Fichas de producto
+      </button>
+      <button class="sb-item" onclick="showView('comercial',this)">
+        <span class="ic">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+          </svg>
+        </span>
+        Fichas comerciales
+      </button>
+      <div class="sb-section">Operaciones</div>
+      <button class="sb-item" onclick="showView('stock',this)">
+        <span class="ic">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path d="M20 7H4a1 1 0 00-1 1v10a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z"/>
+            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+          </svg>
+        </span>
+        Control de stock
+      </button>
+      <div class="sb-section">Sistema</div>
+      <button class="sb-item" onclick="showView('ajustes',this)">
+        <span class="ic">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+        </span>
+        Ajustes
+      </button>
+    </div>
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-avatar" id="sb-avatar">A</div>
+        <div>
+          <div class="sb-username" id="sb-username">Admin</div>
+          <div class="sb-role" id="sb-role">Administrador</div>
+        </div>
+      </div>
+      <button class="sb-logout" onclick="doLogout()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+          <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+        Cerrar sesión
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-sub" id="topbar-sub">Resumen general</div>
+      </div>
+      <div class="topbar-actions" id="topbar-actions"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL FICHA ═══ -->
+<div class="modal-overlay" id="modal-ficha">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-ficha-title">Nueva ficha</div>
+      <button class="modal-close" onclick="closeModal('modal-ficha')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ficha-id">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Nombre del producto</label>
+          <input type="text" id="f-nombre" placeholder="Ej: Trufa negra con sal">
+        </div>
+        <div class="form-field">
+          <label>Referencia</label>
+          <input type="text" id="f-ref" placeholder="TRP-SAL-001">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Categoría</label>
+          <input type="text" id="f-categoria" placeholder="Condimento · Sal gourmet">
+        </div>
+        <div class="form-field">
+          <label>Fabricación</label>
+          <select id="f-fab">
+            <option value="propia">Fabricación propia</option>
+            <option value="externo">Fabricación externa</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Descripción</label>
+        <textarea id="f-desc" rows="3" placeholder="Descripción comercial del producto..."></textarea>
+      </div>
+      <div class="form-field">
+        <label>Ingredientes</label>
+        <textarea id="f-ingredientes" rows="2" placeholder="Sal marina, trufa negra (T. melanosporum) mín. 3%"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Formato / Presentación</label>
+          <input type="text" id="f-formato" placeholder="Tarro cristal 60 g">
+        </div>
+        <div class="form-field">
+          <label>Conservación</label>
+          <input type="text" id="f-conservacion" placeholder="Lugar fresco y seco">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Uso recomendado</label>
+          <input type="text" id="f-uso" placeholder="Acabado en carnes, huevos...">
+        </div>
+        <div class="form-field">
+          <label>Maridaje</label>
+          <input type="text" id="f-maridaje" placeholder="Foie, risotto, pasta fresca">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Temporada</label>
+          <input type="text" id="f-temporada" placeholder="Disponible todo el año">
+        </div>
+        <div class="form-field">
+          <label>Alérgenos</label>
+          <input type="text" id="f-alergenos" placeholder="Sin alérgenos de declaración...">
+        </div>
+      </div>
+      <div class="form-field">
+        <label>PVP hostelería (€)</label>
+        <input type="number" id="f-pvp" placeholder="0.00" step="0.01">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-ficha')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveFicha()">Guardar ficha</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL STOCK ═══ -->
+<div class="modal-overlay" id="modal-stock">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-stock-title">Editar stock</div>
+      <button class="modal-close" onclick="closeModal('modal-stock')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="stock-id">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Referencia</label>
+          <input type="text" id="s-ref" readonly style="background:var(--bg);color:var(--muted)">
+        </div>
+        <div class="form-field">
+          <label>Producto</label>
+          <input type="text" id="s-nombre" readonly style="background:var(--bg);color:var(--muted)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Cantidad actual (unidades)</label>
+          <input type="number" id="s-cantidad" min="0">
+        </div>
+        <div class="form-field">
+          <label>Stock mínimo</label>
+          <input type="number" id="s-minimo" min="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label>Lote / código</label>
+          <input type="text" id="s-lote" placeholder="LOT-2025-001">
+        </div>
+        <div class="form-field">
+          <label>Caducidad</label>
+          <input type="date" id="s-caducidad">
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Notas</label>
+        <textarea id="s-notas" rows="2" placeholder="Observaciones de almacén..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-stock')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveStock()">Actualizar stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATOS INICIALES
+// ═══════════════════════════════════════════
+const USERS_DEFAULT = [
+  {id:'u1',username:'admin',password:'truficas2025',name:'Administrador',role:'admin',initials:'AD'},
+  {id:'u2',username:'truficas',password:'trufa2025',name:'Truficas',role:'editor',initials:'TR'}
+];
+
+const FICHAS_DEFAULT = [
+  {
+    id:'f1',ref:'TRP-SAL-001',nombre:'Trufa negra con sal',
+    categoria:'Condimento · Sal gourmet',fab:'propia',
+    desc:'Sal marina de calidad superior mezclada con trufa negra (Tuber melanosporum) de Mora de Rubielos, lista para aportar aroma y profundidad a cualquier plato.',
+    ingredientes:'Sal marina, trufa negra (Tuber melanosporum) mín. 3%',
+    formato:'Tarro cristal 60 g · Tapa negra',
+    conservacion:'Lugar fresco y seco, sin refrigeración',
+    uso:'Acabado en carnes, huevos, pastas, arroces y quesos',
+    maridaje:'Huevos revueltos, foie, solomillo, mantequilla trufada',
+    temporada:'Disponible todo el año',
+    alergenos:'Sin alérgenos de declaración obligatoria',
+    pvp:8
+  },
+  {
+    id:'f2',ref:'TRP-LAM-001',nombre:'Láminas de trufa negra',
+    categoria:'Trufa elaborada · Conserva',fab:'propia',
+    desc:'Trufa negra (Tuber melanosporum) cortada en finas láminas y conservada en su propio jugo, para uso directo en cocina de alta gama con mínima manipulación.',
+    ingredientes:'Trufa negra (Tuber melanosporum) 85%, agua, sal',
+    formato:'Tarro cristal 30 g / 50 g',
+    conservacion:'Refrigerado tras apertura, consumir en 5 días',
+    uso:'Decoración y acabado en alta cocina, tapas y canapés',
+    maridaje:'Risotto, foie mi-cuit, tortilla de patata, pasta fresca',
+    temporada:'Producción nov–mar, disponible todo el año en conserva',
+    alergenos:'Sin alérgenos de declaración obligatoria',
+    pvp:28
+  },
+  {
+    id:'f3',ref:'TRP-TAR-001',nombre:'Tartufata',
+    categoria:'Salsa · Condimento elaborado',fab:'externo',
+    desc:'Crema de setas y trufa negra de textura untuosa, elaborada por proveedor especializado con trufa aportada por Truficas.',
+    ingredientes:'Champiñón, aceite de oliva, trufa negra (T. melanosporum) mín. 5%, sal',
+    formato:'Tarro cristal 80 g / 180 g',
+    conservacion:'Temperatura ambiente. Refrigerar tras apertura',
+    uso:'Untable, salsa para pasta, base de salsas y rellenos',
+    maridaje:'Bruschetta, pasta al huevo, carne a la plancha',
+    temporada:'Disponible todo el año',
+    alergenos:'Puede contener trazas de gluten',
+    pvp:9
+  },
+  {
+    id:'f4',ref:'TRP-MER-001',nombre:'Mermelada de cebolla con trufa',
+    categoria:'Mermelada gourmet · Condimento dulce',fab:'externo',
+    desc:'Mermelada de cebolla caramelizada con notas de trufa negra, elaborada por obrador externo.',
+    ingredientes:'Cebolla 60%, azúcar, vinagre de vino, trufa negra (T. melanosporum) mín. 2%, pectina',
+    formato:'Tarro cristal 100 g / 200 g',
+    conservacion:'12 meses a temperatura ambiente. 30 días en frío tras apertura',
+    uso:'Tabla de quesos, patés, hamburguesas gourmet y foie',
+    maridaje:'Foie mi-cuit, hamburguesa wagyu, terrina de caza',
+    temporada:'Disponible todo el año',
+    alergenos:'Sin alérgenos de declaración obligatoria',
+    pvp:7
+  }
+];
+
+const STOCK_DEFAULT = [
+  {id:'s1',fichaId:'f1',ref:'TRP-SAL-001',nombre:'Trufa negra con sal',cantidad:48,minimo:20,lote:'LOT-2025-001',caducidad:'2027-01-15',notas:''},
+  {id:'s2',fichaId:'f2',ref:'TRP-LAM-001',nombre:'Láminas de trufa negra',cantidad:12,minimo:15,lote:'LOT-2025-002',caducidad:'2027-03-10',notas:'Nivel bajo — pendiente reposición'},
+  {id:'s3',fichaId:'f3',ref:'TRP-TAR-001',nombre:'Tartufata',cantidad:35,minimo:20,lote:'EXT-2025-T01',caducidad:'2026-11-30',notas:''},
+  {id:'s4',fichaId:'f4',ref:'TRP-MER-001',nombre:'Mermelada de cebolla con trufa',cantidad:6,minimo:20,lote:'EXT-2025-M01',caducidad:'2026-09-15',notas:'URGENTE: stock crítico'}
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let state = {
+  users: [],fichas:[],stock:[],
+  currentUser: null, currentView: 'dashboard'
+};
+
+function loadState(){
+  state.users = JSON.parse(localStorage.getItem('truf_users')||'null') || USERS_DEFAULT;
+  state.fichas = JSON.parse(localStorage.getItem('truf_fichas')||'null') || FICHAS_DEFAULT;
+  state.stock = JSON.parse(localStorage.getItem('truf_stock')||'null') || STOCK_DEFAULT;
+  const su = sessionStorage.getItem('truf_session');
+  if(su) state.currentUser = JSON.parse(su);
+}
+function saveData(){
+  localStorage.setItem('truf_users', JSON.stringify(state.users));
+  localStorage.setItem('truf_fichas', JSON.stringify(state.fichas));
+  localStorage.setItem('truf_stock', JSON.stringify(state.stock));
+}
+
+// ═══════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const user = state.users.find(x=>x.username===u && x.password===p);
+  if(!user){
+    document.getElementById('login-error').style.display='block';return;
+  }
+  state.currentUser = user;
+  sessionStorage.setItem('truf_session', JSON.stringify(user));
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('sb-username').textContent = user.name;
+  document.getElementById('sb-role').textContent = user.role==='admin'?'Administrador':'Editor';
+  document.getElementById('sb-avatar').textContent = user.initials;
+  showView('dashboard', document.querySelector('.sb-item'));
+}
+
+function doLogout(){
+  sessionStorage.removeItem('truf_session');
+  state.currentUser = null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+}
+
+document.getElementById('login-pass').addEventListener('keydown',e=>{
+  if(e.key==='Enter') doLogin();
+});
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showView(view, btn){
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  state.currentView = view;
+  const titles = {
+    dashboard:['Dashboard','Resumen general'],
+    fichas:['Fichas de producto','Catálogo Truficas del Río Pilas'],
+    comercial:['Fichas comerciales','Argumentario por canal de venta'],
+    stock:['Control de stock','Inventario por referencia'],
+    ajustes:['Ajustes','Configuración del sistema']
+  };
+  const [t,s] = titles[view]||['',''];
+  document.getElementById('topbar-title').textContent = t;
+  document.getElementById('topbar-sub').textContent = s;
+  document.getElementById('topbar-actions').innerHTML = '';
+  const views = {dashboard:renderDashboard,fichas:renderFichas,comercial:renderFichasComerciales,stock:renderStock,ajustes:renderAjustes};
+  (views[view]||renderDashboard)();
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+function renderDashboard(){
+  const low = state.stock.filter(s=>s.cantidad<=s.minimo).length;
+  const totalRefs = state.fichas.length;
+  const propias = state.fichas.filter(f=>f.fab==='propia').length;
+  const stockTotal = state.stock.reduce((a,s)=>a+s.cantidad,0);
+
+  document.getElementById('content').innerHTML = `
+  <div class="grid-4 mb-4">
+    <div class="metric">
+      <div class="metric-label">Referencias activas</div>
+      <div class="metric-value">${totalRefs}</div>
+      <div class="metric-sub">${propias} fabricación propia</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Unidades en stock</div>
+      <div class="metric-value">${stockTotal}</div>
+      <div class="metric-sub">Total todas referencias</div>
+    </div>
+    <div class="metric" style="${low>0?'border-color:#f0c0bc;':''}" >
+      <div class="metric-label">Alertas de stock</div>
+      <div class="metric-value" style="${low>0?'color:var(--red)':'color:var(--gm)'}">${low}</div>
+      <div class="metric-sub">${low>0?'Referencias bajo mínimo':'Todo en orden'}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Último acceso</div>
+      <div class="metric-value" style="font-size:16px">${state.currentUser?.name||'—'}</div>
+      <div class="metric-sub">${new Date().toLocaleDateString('es-ES')}</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div style="font-weight:500">Estado del stock</div>
+        <button class="btn btn-sm" onclick="showView('stock',document.querySelectorAll('.sb-item')[3])">Ver todo</button>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table>
+          <thead><tr>
+            <th>Producto</th><th>Cant.</th><th>Estado</th>
+          </tr></thead>
+          <tbody>
+            ${state.stock.map(s=>{
+              const pct = Math.min(100,Math.round((s.cantidad/Math.max(s.minimo*2,1))*100));
+              const status = s.cantidad<=0?'Sin stock':s.cantidad<=s.minimo?'Bajo':'OK';
+              const color = s.cantidad<=0?'var(--red)':s.cantidad<=s.minimo?'#B8760A':'var(--gm)';
+              return `<tr>
+                <td><div style="font-weight:500;font-size:13px">${s.nombre}</div>
+                    <div class="text-xs text-muted">${s.ref}</div></td>
+                <td>${s.cantidad} ud.</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="dot" style="background:${color}"></div>
+                    <span style="font-size:12px;color:${color}">${status}</span>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div style="font-weight:500">Catálogo de producto</div>
+        <button class="btn btn-sm" onclick="showView('fichas',document.querySelectorAll('.sb-item')[2])">Ver todo</button>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table>
+          <thead><tr><th>Referencia</th><th>Producto</th><th>Fabricación</th></tr></thead>
+          <tbody>
+            ${state.fichas.map(f=>`<tr>
+              <td class="text-muted text-xs">${f.ref}</td>
+              <td style="font-weight:500">${f.nombre}</td>
+              <td>${f.fab==='propia'
+                ?'<span class="tag-fab-propia">Propia</span>'
+                :'<span class="tag-fab-externo">Externa</span>'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+// FICHAS
+// ═══════════════════════════════════════════
+function renderFichas(){
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn btn-gold no-print" onclick="printAllFichas()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+        <path d="M6 14h12v8H6z"/>
+      </svg>
+      Imprimir todas
+    </button>
+    <button class="btn btn-primary no-print" onclick="openFichaModal()">
+      + Nueva ficha
+    </button>`;
+
+  document.getElementById('content').innerHTML = `
+  <div id="fichas-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px"></div>`;
+  renderFichasGrid();
+}
+
+function renderFichasGrid(){
+  const grid = document.getElementById('fichas-grid');
+  if(!grid) return;
+  if(state.fichas.length===0){
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">📋</div><div>Sin fichas de producto</div><div class="text-sm mt-4"><button class="btn btn-primary" onclick="openFichaModal()">Crear primera ficha</button></div></div>';
+    return;
+  }
+  grid.innerHTML = state.fichas.map(f=>`
+  <div class="card print-card" id="ficha-card-${f.id}">
+    <div class="card-header">
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500">${f.nombre}</div>
+        <div class="text-xs text-muted mt-2">${f.categoria}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        ${f.fab==='propia'
+          ?'<span class="tag-fab-propia">Fabricación propia</span>'
+          :'<span class="tag-fab-externo">Fabricación externa</span>'}
+        <span class="text-xs text-muted">${f.ref}</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--muted);margin-bottom:12px">${f.desc}</div>
+      <div class="divider" style="margin:10px 0"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px">
+        ${renderFichaField('Ingredientes',f.ingredientes,'full')}
+        ${renderFichaField('Formato',f.formato)}
+        ${renderFichaField('Conservación',f.conservacion)}
+        ${renderFichaField('Uso',f.uso)}
+        ${renderFichaField('Maridaje',f.maridaje)}
+        ${renderFichaField('Temporada',f.temporada)}
+        ${renderFichaField('Alérgenos',f.alergenos)}
+        ${f.pvp?renderFichaField('PVP hostelería',f.pvp+' €'):''}
+      </div>
+    </div>
+    <div class="card-header no-print" style="border-top:1px solid var(--rule);border-bottom:none;justify-content:flex-end;padding:10px 16px">
+      <button class="btn btn-sm" onclick="printFicha('${f.id}')">Imprimir</button>
+      <button class="btn btn-sm" onclick="openFichaModal('${f.id}')">Editar</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteFicha('${f.id}')">Eliminar</button>
+    </div>
+  </div>`).join('');
+}
+
+function renderFichaField(label,value,span=''){
+  if(!value) return '';
+  return `<div style="${span==='full'?'grid-column:1/-1':''}">
+    <div class="field-label">${label}</div>
+    <div style="font-size:13px;color:var(--ink)">${value}</div>
+  </div>`;
+}
+
+function openFichaModal(id){
+  const el = id ? state.fichas.find(f=>f.id===id) : null;
+  document.getElementById('modal-ficha-title').textContent = el ? 'Editar ficha' : 'Nueva ficha';
+  document.getElementById('ficha-id').value = el?.id||'';
+  ['nombre','ref','categoria','desc','ingredientes','formato','conservacion','uso','maridaje','temporada','alergenos'].forEach(k=>{
+    document.getElementById('f-'+k).value = el?.[k]||'';
+  });
+  document.getElementById('f-fab').value = el?.fab||'propia';
+  document.getElementById('f-pvp').value = el?.pvp||'';
+  document.getElementById('modal-ficha').classList.add('open');
+}
+
+function saveFicha(){
+  const id = document.getElementById('ficha-id').value;
+  const data = {
+    id: id||'f'+Date.now(),
+    nombre:document.getElementById('f-nombre').value.trim(),
+    ref:document.getElementById('f-ref').value.trim(),
+    categoria:document.getElementById('f-categoria').value.trim(),
+    fab:document.getElementById('f-fab').value,
+    desc:document.getElementById('f-desc').value.trim(),
+    ingredientes:document.getElementById('f-ingredientes').value.trim(),
+    formato:document.getElementById('f-formato').value.trim(),
+    conservacion:document.getElementById('f-conservacion').value.trim(),
+    uso:document.getElementById('f-uso').value.trim(),
+    maridaje:document.getElementById('f-maridaje').value.trim(),
+    temporada:document.getElementById('f-temporada').value.trim(),
+    alergenos:document.getElementById('f-alergenos').value.trim(),
+    pvp:parseFloat(document.getElementById('f-pvp').value)||0
+  };
+  if(!data.nombre){showToast('El nombre es obligatorio','error');return;}
+  if(id){
+    const idx = state.fichas.findIndex(f=>f.id===id);
+    state.fichas[idx]=data;
+  } else {
+    state.fichas.push(data);
+    // auto-add stock entry
+    if(!state.stock.find(s=>s.fichaId===data.id)){
+      state.stock.push({id:'s'+Date.now(),fichaId:data.id,ref:data.ref,nombre:data.nombre,cantidad:0,minimo:10,lote:'',caducidad:'',notas:''});
+    }
+  }
+  saveData();
+  closeModal('modal-ficha');
+  renderFichasGrid();
+  showToast(id?'Ficha actualizada':'Ficha creada');
+}
+
+function deleteFicha(id){
+  if(!confirm('¿Eliminar esta ficha de producto?')) return;
+  state.fichas = state.fichas.filter(f=>f.id!==id);
+  state.stock = state.stock.filter(s=>s.fichaId!==id);
+  saveData();
+  renderFichasGrid();
+  showToast('Ficha eliminada');
+}
+
+function printFicha(id){
+  const card = document.getElementById('ficha-card-'+id);
+  if(!card) return;
+  const btns = card.querySelectorAll('.no-print');
+  btns.forEach(b=>b.style.display='none');
+  window.print();
+  btns.forEach(b=>b.style.display='');
+}
+
+function printAllFichas(){ window.print(); }
+
+// ═══════════════════════════════════════════
+// FICHAS COMERCIALES — 4 productos × 2 canales
+// ═══════════════════════════════════════════
+const FICHAS_COM = [
+  {
+    id:'sal', ref:'TRP-SAL-001', nombre:'Trufa negra con sal', fab:'propia',
+    ingredientes:'Sal marina, Tuber melanosporum mín. 3%',
+    formato:'Tarro cristal 60 g / 200 g / 20 g', conservacion:'Lugar fresco y seco. Sin refrigeración',
+    caducidad:'24 meses', alergenos:'Sin alérgenos de declaración obligatoria',
+    origen:'Mora de Rubielos, Teruel (España)', temporada:'Todo el año',
+    canales:{
+      hosteleria:{
+        intro:'El condimento de trufa real con la mejor ecuación coste-impacto: trufa certificada de Mora de Rubielos, aplicable por cualquier miembro del equipo en segundos.',
+        args:[
+          {t:'Trazabilidad comunicable en sala',b:'Tuber melanosporum de Mora de Rubielos con lote trazable al productor. El chef puede narrar el origen al cliente — imposible con marcas de distribución.',c:'"Su cliente no pide sal con trufa — pide una historia que contar en sala."'},
+          {t:'Aplicación inmediata sin formación específica',b:'No requiere corte ni gestión de merma. Cualquier miembro del equipo la aplica en segundos con resultado consistente en cada pase.',c:'"Consistencia en cocina sin depender del chef ejecutivo."'},
+          {t:'Coste por ración < 0,15 € — suplemento 2–4 € en carta',b:'Un tarro de 60 g cubre 60–80 raciones. Mejor ratio impacto económico/experiencia disponible en el mercado.',c:'"El ingrediente con mejor ROI del menú."'},
+          {t:'Exclusividad de proveedor como diferencial',b:'Productor directo, no distribuidor. Permite usar el nombre Truficas en carta y comunicación — diferenciación que el competidor de cash & carry no puede igualar.',c:'"La sal es la misma en todos lados. La procedencia no lo es."'}
+        ],
+        pricing:[
+          {ch:'Formato 60 g · hostelería',p:'7–9 €/ud.',m:'Margen ~63%',info:'Caja 6 ud. · 42–54 €'},
+          {ch:'Formato 200 g · profesional',p:'18–22 €/ud.',m:'Margen ~65%',info:'Caja 3 ud. · 54–66 €'},
+          {ch:'Muestra 20 g',p:'Sin coste',m:'Entrada sin compromiso',info:'Pedido mínimo posterior'}
+        ],
+        objeciones:[
+          {q:'"Ya tengo aceite de trufa."',a:'El aceite suele ser aromatizado sintético. La sal aporta trufa real — son productos distintos y complementarios.'},
+          {q:'"El precio es alto."',a:'Coste por ración < 0,20 €. El origen verificable tiene valor comercial en sala que ningún distribuidor puede igualar.'},
+          {q:'"¿Qué % de trufa lleva?"',a:'Mínimo 3% declarado en etiqueta, lote trazable. Facilitamos ficha técnica con análisis sensorial si la necesitan.'},
+          {q:'"No sé si mis clientes lo valorarán."',a:'Muestra de 20 g sin coste. Sin compromiso de volumen hasta confirmar encaje en carta.'}
+        ],
+        condiciones:'Pedido mínimo 1 caja (6 ud. × 60 g). Entrega 5–7 días. Pago 30 días con cuenta abierta.'
+      },
+      delicatessen:{
+        intro:'El producto de trufa real con mayor potencial de rotación en lineal gourmet: ticket accesible, origen certificable, 24 meses de caducidad y margen superior al 60%.',
+        args:[
+          {t:'Ticket de entrada más bajo de la categoría trufa',b:'A 12–14 € PVP es el producto de trufa real más accesible del lineal. El cliente que no compra láminas sí compra la sal — y repite.',c:'"El producto que convierte al curioso en comprador de trufa."'},
+          {t:'Origen trazable que la tienda puede comunicar',b:'Tuber melanosporum de Mora de Rubielos, productor directo. La tienda puede comunicarlo en cartel, redes y newsletter — diferenciación frente a marcas de gran distribución.',c:'"No es una sal con trufa. Es la sal de Truficas."'},
+          {t:'Margen +60% sin riesgo de merma',b:'Precio compra ~5–6 €, PVP 12–14 €. Caducidad 24 meses — sin el riesgo de trufa fresca o conservas abiertas.',c:'"Margen de bodega con rotación de condimento."'},
+          {t:'Producto regalo de alto valor percibido',b:'Tarro cristal con tapa negra y etiqueta kraft con presencia premium. Miniatura de 20 g para cestas gourmet de alta rentabilidad.',c:'"El mejor regalo para quien ya tiene de todo."'}
+        ],
+        pricing:[
+          {ch:'Precio compra tienda 60 g',p:'5–6 €/ud.',m:'Precio Truficas',info:'—'},
+          {ch:'PVP recomendado 60 g',p:'12–14 €/ud.',m:'Margen ~60–65%',info:'—'},
+          {ch:'PVP miniatura 20 g',p:'4–5 €/ud.',m:'Alto margen percibido',info:'Ideal cesta regalo'}
+        ],
+        objeciones:[
+          {q:'"Ya tengo una sal trufada."',a:'¿De dónde es la trufa? ¿Está declarado el %? Truficas es productor directo en Teruel con lote trazable — categoría diferente.'},
+          {q:'"El precio es alto para mis clientes."',a:'A 12–14 € es el producto de trufa real más accesible del mercado. Compite con una botella de vino de entrada.'},
+          {q:'"¿Qué rotación puedo esperar?"',a:'Arrancar con 6 unidades sin compromiso. 24 meses de caducidad — cero riesgo de merma. Si no rota en un mes, lo retiramos.'},
+          {q:'"No tengo espacio en el lineal."',a:'Ocupa menos de 8 cm. Puede arrancar en mostrador junto a caja como producto de impulso — ahí convierte mejor.'}
+        ],
+        condiciones:'Pedido mínimo 6 unidades 60 g. Entrega 5–7 días. Muestra 20 g sin coste previa al primer pedido.'
+      }
+    }
+  },
+  {
+    id:'laminas', ref:'TRP-LAM-001', nombre:'Láminas de trufa negra', fab:'propia',
+    ingredientes:'Tuber melanosporum 85%, agua, sal',
+    formato:'Tarro cristal 30 g / 50 g', conservacion:'Refrigerar tras apertura. Consumir en 5 días',
+    caducidad:'24 meses sin abrir', alergenos:'Sin alérgenos de declaración obligatoria',
+    origen:'Mora de Rubielos, Teruel (España)', temporada:'Producción nov–mar · Disponible todo el año en conserva',
+    canales:{
+      hosteleria:{
+        intro:'La trufa negra en su expresión más pura: láminas de Tuber melanosporum conservadas en su propio jugo, listas para usar directamente en cocina de alta gama sin preparación previa.',
+        args:[
+          {t:'El producto de mayor impacto visual en sala',b:'Las láminas permiten decorar el plato con trufa real visible — un argumento de venta único para el chef y para el comensal que lo fotografía.',c:'"Lo que el cliente no puede fotografiar no existe en redes. Lo que sí puede, lo comparte."'},
+          {t:'85% trufa — sin rellenos ni edulcorantes',b:'Composición excepcional: 85% Tuber melanosporum. Sin almidones, sin agentes de textura. El chef sabe exactamente lo que usa y puede comunicarlo con credibilidad total.',c:'"85% trufa negra. Que lo diga el etiquetado habla por sí solo."'},
+          {t:'Trazabilidad de lote al productor — certificable para carta',b:'Origen verificable en Mora de Rubielos, con lote identificable. Permite incluir en carta: "Trufa negra Truficas del Río Pilas, Teruel" con todas las garantías.',c:'"El restaurante que puede nombrar a su productor se diferencia del que no puede."'},
+          {t:'Sin preparación previa — coste de manipulación cero',b:'No requiere hidratación, corte especial ni control de temperatura previa. Se abre el tarro y se aplica directamente. Reduce errores y tiempo en pase.',c:'"Alta cocina sin complejidad operativa."'}
+        ],
+        pricing:[
+          {ch:'Formato 30 g · hostelería',p:'18–22 €/ud.',m:'Margen ~60%',info:'Caja 6 ud.'},
+          {ch:'Formato 50 g · alta cocina',p:'28–34 €/ud.',m:'Margen ~62%',info:'Caja 4 ud.'},
+          {ch:'Muestra 30 g',p:'Sin coste',m:'Entrada sin compromiso',info:'—'}
+        ],
+        objeciones:[
+          {q:'"Uso trufa fresca en temporada."',a:'La trufa fresca exige gestión de merma, temperatura y uso inmediato. Las láminas dan consistencia todo el año sin esa complejidad operativa.'},
+          {q:'"El precio por gramo es alto."',a:'El 85% de contenido real hace que el coste efectivo por ración sea competitivo. Una lata de trufa de importación al 40% cuesta más por gramo de trufa real.'},
+          {q:'"¿Cómo conservo el tarro abierto?"',a:'En refrigeración 5 días cubierto con el jugo. La proporción lámina/jugo es ideal para preservar el aroma tras la apertura.'},
+          {q:'"No tengo formato de alta cocina en carta."',a:'El formato 30 g es suficiente para 6–8 raciones de acabado. No hace falta un menú degustación para justificarlo.'}
+        ],
+        condiciones:'Pedido mínimo 4 unidades. Entrega 5–7 días en frío. Muestra de 30 g sin coste para valoración en cocina.'
+      },
+      delicatessen:{
+        intro:'El producto de trufa premium por excelencia para el lineal delicatessen: 85% Tuber melanosporum de Mora de Rubielos, listo para usar, con la mayor concentración de trufa real disponible en conserva.',
+        args:[
+          {t:'El producto de referencia para el foodie con criterio',b:'El cliente avanzado que busca trufa real sabe leer la etiqueta. 85% Tuber melanosporum lo dice todo — ningún competidor de distribución puede igualarlo.',c:'"Para el cliente que sabe lo que compra."'},
+          {t:'Precio premium justificado y comunicable',b:'A 28–34 € el PVP el tarro de 50 g, el cliente compara con la trufa fresca de temporada a 400–600 €/kg. La relación calidad-precio es objetivamente favorable.',c:'"Premium con argumento. No premium sin sustancia."'},
+          {t:'Producto regalo de nicho con altísima percepción de valor',b:'El tarro de cristal con láminas visibles tiene un impacto visual único. Es el regalo de trufa que el destinatario recuerda — y que la tienda puede narrar.',c:'"El regalo que demuestra que quien lo da, sabe."'},
+          {t:'Diferenciación de lineal imposible de replicar por grandes cadenas',b:'Truficas es productor directo. Ningún distribuidor nacional puede ofrecer este origen con esta trazabilidad a este precio. La tienda que lo tiene, tiene algo exclusivo.',c:'"Exclusividad que no tiene precio de exclusividad."'}
+        ],
+        pricing:[
+          {ch:'Precio compra tienda 30 g',p:'10–12 €/ud.',m:'Precio Truficas',info:'—'},
+          {ch:'PVP recomendado 30 g',p:'22–26 €/ud.',m:'Margen ~55–60%',info:'—'},
+          {ch:'PVP recomendado 50 g',p:'28–34 €/ud.',m:'Margen ~58–62%',info:'Formato regalo'}
+        ],
+        objeciones:[
+          {q:'"Es demasiado caro para mis clientes."',a:'El perfil de cliente de láminas no es el mismo que el de la sal. Si tu tienda vende foie, queso artesano o aceite premium, hay cliente para esto.'},
+          {q:'"¿Cómo explico el precio al cliente?"',a:'85% trufa real, productor directo en Teruel, trazabilidad de lote. Tres datos que el cliente avanzado ya conoce y valora.'},
+          {q:'"¿Qué caducidad tiene sin abrir?"',a:'24 meses. Sin riesgo de merma. Una vez abierto, 5 días en refrigeración — lo cual es una ventaja comunicable: frescura garantizada.'},
+          {q:'"¿Con qué mínimo puedo arrancar?"',a:'4 unidades de 30 g. Caben en media balda. Si no rotan en 30 días, las retiramos sin coste.'}
+        ],
+        condiciones:'Pedido mínimo 4 unidades. Muestra previa sin coste. Posibilidad de hoja de producto para el punto de venta.'
+      }
+    }
+  },
+  {
+    id:'tartufata', ref:'TRP-TAR-001', nombre:'Tartufata', fab:'externo',
+    ingredientes:'Champiñón, aceite de oliva, Tuber melanosporum mín. 5%, sal',
+    formato:'Tarro cristal 80 g / 180 g', conservacion:'Temperatura ambiente. Refrigerar tras apertura',
+    caducidad:'18 meses', alergenos:'Puede contener trazas de gluten',
+    origen:'Elaboración externa · Trufa Truficas del Río Pilas', temporada:'Todo el año',
+    canales:{
+      hosteleria:{
+        intro:'Crema de setas y trufa negra de textura untuosa y aplicación inmediata. Elaborada con trufa Truficas del Río Pilas para garantizar calidad y origen en cada tarro.',
+        args:[
+          {t:'Versatilidad máxima con un solo producto',b:'Base de salsas, untable, relleno de pasta, topping de pizza gourmet, fondo de risotto. Un solo tarro resuelve múltiples aplicaciones sin preparación adicional.',c:'"Un producto, diez usos. Eso es eficiencia en cocina."'},
+          {t:'Coste por ración inferior a 0,30 € — versátil en toda la carta',b:'El formato 180 g permite hasta 30–40 aplicaciones de acabado o 15 bases de salsa completas. ROI muy alto para un ingrediente de trufa.',c:'"Trufa en carta sin trufa en el coste."'},
+          {t:'Trufa Truficas del Río Pilas — origen garantizado incluso en maquila',b:'Aunque la elaboración es externa, la trufa es aportada por Truficas. El establecimiento puede comunicar el origen de la trufa con todas las garantías.',c:'"El origen de la trufa lo controlamos nosotros."'},
+          {t:'Temperatura ambiente — sin cadena de frío, sin merma',b:'A diferencia de láminas o trufa fresca, la tartufata no requiere refrigeración hasta su apertura. Simplifica la logística y elimina la caducidad de urgencia.',c:'"El ingrediente de trufa más fácil de gestionar en cocina."'}
+        ],
+        pricing:[
+          {ch:'Formato 80 g · hostelería',p:'5–7 €/ud.',m:'Margen ~60%',info:'Caja 6 ud.'},
+          {ch:'Formato 180 g · cocina',p:'10–13 €/ud.',m:'Margen ~62%',info:'Caja 6 ud.'},
+          {ch:'Muestra 80 g',p:'Sin coste',m:'Entrada sin compromiso',info:'—'}
+        ],
+        objeciones:[
+          {q:'"Tengo ya una crema de trufa de otro proveedor."',a:'¿La trufa en esa crema es de origen declarado? La tartufata lleva trufa Truficas de Teruel — trazable y comunicable al cliente.'},
+          {q:'"¿Cuánto % de trufa real lleva?"',a:'Mínimo 5% de Tuber melanosporum, declarado en etiqueta. Por encima de la mayoría de productos equivalentes en el mercado.'},
+          {q:'"¿Cómo la aplico?"',a:'Directamente del tarro: sobre pasta, como base de salsa, en untable caliente. Sin cocción obligatoria — el aroma se preserva mejor en frío o templado.'},
+          {q:'"¿Tiene gluten?"',a:'Puede contener trazas. Apto para cartas sin gluten declarado solo si el establecimiento acepta el margen de traza. Lo indicamos siempre en la ficha técnica.'}
+        ],
+        condiciones:'Pedido mínimo 6 unidades 80 g. Entrega 5–7 días. Sin cadena de frío en transporte.'
+      },
+      delicatessen:{
+        intro:'La crema de trufa más accesible y versátil del lineal: mínimo 5% Tuber melanosporum de Truficas del Río Pilas, lista para usar, con el ticket más bajo de la gama.',
+        args:[
+          {t:'El producto de trufa de mayor rotación potencial',b:'A 8–10 € PVP, la tartufata es el primer producto de trufa que el cliente inexperto añade a su cesta. Bajo riesgo percibido, alto valor gastronómico.',c:'"El primer sí del cliente que nunca ha comprado trufa."'},
+          {t:'Aplicación inmediata — elimina la barrera de "no sé cómo usarla"',b:'Pan, pasta, carne, pizza, verduras — la tartufata no exige técnica. El cliente compra con confianza porque entiende cómo va a usarla antes de salir de la tienda.',c:'"El producto de trufa que no intimida."'},
+          {t:'Trufa de origen Truficas — diferenciación frente a marcas sin trazabilidad',b:'Con mínimo 5% declarado y origen trazable en Teruel, la tartufata de Truficas se diferencia de la mayoría de cremas de trufa en lineal gourmet.',c:'"Misma categoría, origen incomparable."'},
+          {t:'Formato regalo accesible para cestas de precio medio',b:'El tarro de 80 g entra en cualquier cesta gourmet por debajo de 30 €. Complementa la sal o las láminas para cestas de mayor ticket sin disparar el coste.',c:'"El complemento perfecto para la cesta de trufa completa."'}
+        ],
+        pricing:[
+          {ch:'Precio compra tienda 80 g',p:'3,5–4,5 €/ud.',m:'Precio Truficas',info:'—'},
+          {ch:'PVP recomendado 80 g',p:'8–10 €/ud.',m:'Margen ~55–60%',info:'—'},
+          {ch:'PVP recomendado 180 g',p:'16–20 €/ud.',m:'Margen ~58–62%',info:'Formato familia'}
+        ],
+        objeciones:[
+          {q:'"Ya tengo una crema de trufa."',a:'¿Cuál es el % de trufa declarado? La de Truficas lleva mín. 5% de T. melanosporum de Teruel. Hay diferencia en calidad y en lo que puedes comunicar al cliente.'},
+          {q:'"El lineal de cremas está muy competido."',a:'La diferencia es el origen. La mayoría de cremas de lineal no declaran procedencia de la trufa. Ésta sí — y eso se comunica en el cartel.'},
+          {q:'"¿Hay alérgenos?"',a:'Puede contener trazas de gluten. Para el cliente celiaco declarado, se lo indicamos. Para el resto del público, no es un obstáculo.'},
+          {q:'"¿Cuánto dura una vez abierta?"',a:'En refrigeración, 5–7 días. El formato 80 g está calibrado para un uso doméstico de 1–2 semanas — sin problema de que el cliente se quede con stock.'}
+        ],
+        condiciones:'Pedido mínimo 6 unidades 80 g. Entrega 5–7 días. Muestra 80 g sin coste previa al primer pedido.'
+      }
+    }
+  },
+  {
+    id:'mermelada', ref:'TRP-MER-001', nombre:'Mermelada de cebolla con trufa', fab:'externo',
+    ingredientes:'Cebolla 60%, azúcar, vinagre de vino, Tuber melanosporum mín. 2%, pectina',
+    formato:'Tarro cristal 100 g / 200 g', conservacion:'12 meses a temperatura ambiente. 30 días en frío tras apertura',
+    caducidad:'12 meses', alergenos:'Sin alérgenos de declaración obligatoria',
+    origen:'Elaboración externa · Trufa Truficas del Río Pilas', temporada:'Todo el año',
+    canales:{
+      hosteleria:{
+        intro:'Mermelada de cebolla caramelizada con notas de trufa negra: el acompañamiento gourmet que eleva tablas de quesos, foie y hamburguesas de carta sin complejidad de elaboración.',
+        args:[
+          {t:'El acompañamiento que transforma cualquier plato en propuesta gourmet',b:'Una cucharada de mermelada de cebolla con trufa junto a un queso curado, un foie o una hamburguesa justifica un suplemento de 1,5–3 € en carta con un coste inferior a 0,20 €.',c:'"El detalle que el cliente recuerda aunque no sepa por qué."'},
+          {t:'Formato de uso inmediato — sin elaboración previa',b:'Sale directamente del tarro al plato, a temperatura ambiente. No requiere calentamiento ni preparación. Reduce tiempos en cocina sin renunciar al factor diferencial.',c:'"La elaboración más rápida con mayor impacto en presentación."'},
+          {t:'Trufa de Truficas — comunicable en carta de forma diferenciada',b:'Aunque la elaboración es externa, la trufa es de Truficas del Río Pilas. El establecimiento puede indicar "mermelada de cebolla con trufa negra de Teruel" con plena garantía de origen.',c:'"Origen trazable incluso en el condimento más pequeño de la tabla."'},
+          {t:'Maridaje universal — amplísima aplicación en cualquier tipo de carta',b:'Funciona en restaurante de cocina tradicional, gastrobar, hotel y catering. Quesos, foie, caza, hamburguesas wagyu, brunch — no hay formato de carta donde no encaje.',c:'"Un producto, cualquier carta."'}
+        ],
+        pricing:[
+          {ch:'Formato 100 g · hostelería',p:'4–5 €/ud.',m:'Margen ~60%',info:'Caja 6 ud.'},
+          {ch:'Formato 200 g · cocina',p:'7–9 €/ud.',m:'Margen ~62%',info:'Caja 6 ud.'},
+          {ch:'Muestra 100 g',p:'Sin coste',m:'Entrada sin compromiso',info:'—'}
+        ],
+        objeciones:[
+          {q:'"Ya tenemos chutney o mermelada propia."',a:'La versión propia tiene coste de elaboración. Esta mermelada con trufa de Truficas es un complemento diferencial que difícilmente replicarás a este precio con trufa real.'},
+          {q:'"¿Solo un 2% de trufa?"',a:'El 2% sobre cebolla caramelizada es suficiente para el perfil aromático. La nota de trufa está presente sin enmascarar la cebolla — el equilibrio es el producto.'},
+          {q:'"¿Cómo la incluyo en carta?"',a:'Como acompañamiento de tabla de quesos, de foie, de hamburguesa o como confit adicional. Puede ir en carta como "mermelada de cebolla con trufa negra de Teruel".'},
+          {q:'"No tengo tabla de quesos en carta."',a:'También funciona en hamburguesas gourmet, brunch, bocadillos premium y en el aperitivo. No es un producto exclusivo del formato tabla.'}
+        ],
+        condiciones:'Pedido mínimo 6 unidades 100 g. Entrega 5–7 días. Sin cadena de frío en transporte.'
+      },
+      delicatessen:{
+        intro:'La mermelada gourmet que vende sola en cualquier lineal de delicatessen: nombre evocador, trufa negra de Truficas, sin alérgenos y con el mejor ratio precio percibido / coste real.',
+        args:[
+          {t:'El producto de trufa de compra más impulsiva del lineal',b:'A 6–8 € PVP, la mermelada es la referencia de trufa que el cliente añade sin pensarlo. Precio no intimidante, nombre atractivo, presentación premium. Compra de impulso perfecta.',c:'"El producto que el cliente coge sin haberlo buscado."'},
+          {t:'Sin alérgenos — accesible para el 100% de los clientes',b:'Sin gluten, sin lácteos, sin frutos secos. La mermelada de cebolla con trufa es la única referencia de la gama apta para todos los perfiles sin restricción.',c:'"La referencia que nunca tienes que explicar con advertencias."'},
+          {t:'Navidad, San Valentín, cestas — el producto más vendido en fechas',b:'Una mermelada gourmet con trufa es el complemento perfecto de cualquier cesta. Precio de entrada bajo, presentación premium, nombre que "suena bien". El producto que siempre va en la cesta.',c:'"No hay cesta gourmet sin un tarro de mermelada especial."'},
+          {t:'Rotación alta con caducidad de 12 meses sin abrir',b:'Sin necesidad de gestión de temperatura hasta la apertura. Rotación natural apoyada en su precio accesible y en su versatilidad de uso en cocina doméstica.',c:'"El producto de trufa más fácil de vender y de reponer."'}
+        ],
+        pricing:[
+          {ch:'Precio compra tienda 100 g',p:'2,5–3,5 €/ud.',m:'Precio Truficas',info:'—'},
+          {ch:'PVP recomendado 100 g',p:'6–8 €/ud.',m:'Margen ~58–63%',info:'—'},
+          {ch:'PVP recomendado 200 g',p:'10–13 €/ud.',m:'Margen ~60–65%',info:'Formato regalo'}
+        ],
+        objeciones:[
+          {q:'"Solo lleva un 2% de trufa."',a:'El 2% sobre cebolla caramelizada da un perfil aromático equilibrado y genuino. No es una mermelada de trufa — es una mermelada de cebolla con trufa. Esa distinción es honesta y el cliente avanzado la valora.'},
+          {q:'"Hay muchas mermeladas de cebolla en el mercado."',a:'Las hay, pero sin trufa de origen declarado. La diferencia está en el etiquetado: Tuber melanosporum de Mora de Rubielos — eso ninguna marca de gran distribución puede decirlo.'},
+          {q:'"¿Cómo la vendo al cliente en tienda?"',a:'"Para quesos curados, foie y charcutería. También en tostadas con queso de cabra." Tres frases y el cliente ya sabe cómo la usa. Facilitar recetario de dos páginas si interesa.'},
+          {q:'"¿Cuánto dura abierta?"',a:'30 días en refrigeración. Para uso doméstico habitual (tabla de quesos de fin de semana), el formato 100 g se termina perfectamente antes.'}
+        ],
+        condiciones:'Pedido mínimo 6 unidades 100 g. Entrega 5–7 días. Muestra 100 g sin coste previa al primer pedido.'
+      }
+    }
+  }
+];
+
+let fcFiltroProducto='sal';
+let fcFiltroCanal='hosteleria';
+
+function renderFichasComerciales(){
+  document.getElementById('topbar-actions').innerHTML=`
+    <button class="btn btn-gold no-print" onclick="window.print()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><path d="M6 14h12v8H6z"/>
+      </svg>
+      Imprimir ficha
+    </button>`;
+
+  document.getElementById('content').innerHTML=`
+  <div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;justify-content:space-between">
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${FICHAS_COM.map(f=>`<button class="btn btn-sm" id="fp-${f.id}" onclick="setFCProducto('${f.id}')">${f.nombre}</button>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-sm" id="fc-hosteleria" onclick="setFCCanal('hosteleria')">Hostelería</button>
+      <button class="btn btn-sm" id="fc-delicatessen" onclick="setFCCanal('delicatessen')">Delicatessen</button>
+    </div>
+  </div>
+  <div id="fc-content"></div>`;
+
+  renderFCSheet();
+}
+
+function setFCProducto(id){ fcFiltroProducto=id; renderFCSheet(); }
+function setFCCanal(id){ fcFiltroCanal=id; renderFCSheet(); }
+
+function renderFCSheet(){
+  const prod = FICHAS_COM.find(f=>f.id===fcFiltroProducto);
+  if(!prod) return;
+  const canal = prod.canales[fcFiltroCanal];
+  const cColor = fcFiltroCanal==='hosteleria'?'var(--gm)':'var(--amber)';
+  const cBg    = fcFiltroCanal==='hosteleria'?'var(--gl)':'var(--amberb)';
+  const cLabel = fcFiltroCanal==='hosteleria'?'Hostelería':'Delicatessen';
+
+  document.querySelectorAll('[id^="fp-"]').forEach(b=>{
+    b.style.background = b.id==='fp-'+fcFiltroProducto ? 'var(--gd)' : '';
+    b.style.color      = b.id==='fp-'+fcFiltroProducto ? '#fff' : '';
+    b.style.borderColor= b.id==='fp-'+fcFiltroProducto ? 'var(--gd)' : '';
+  });
+  document.querySelectorAll('[id^="fc-hosteleria"],[id^="fc-delicatessen"]').forEach(b=>{
+    const active = b.id==='fc-'+fcFiltroCanal;
+    b.style.background  = active ? cColor : '';
+    b.style.color       = active ? '#fff' : '';
+    b.style.borderColor = active ? cColor : '';
+  });
+
+  document.getElementById('fc-content').innerHTML=`
+  <div class="card print-card">
+    <div class="card-header" style="background:${cBg};border-bottom-color:${cColor}33">
+      <div>
+        <div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:${cColor};margin-bottom:4px">Ficha comercial · ${cLabel}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500">${prod.nombre}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Truficas del Río Pilas · ${prod.ref} · ${prod.fab==='propia'?'Fabricación propia':'Fabricación externa'}</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.5">${canal.intro}</div>
+
+      <div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid var(--rule)">Argumentario</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
+        ${canal.args.map((a,i)=>`
+        <div style="display:flex;gap:12px;padding:10px;border:0.5px solid var(--rule);border-radius:var(--radius-sm);background:var(--surface)">
+          <div style="width:24px;height:24px;border-radius:50%;background:${cColor};color:#fff;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500;margin-bottom:3px">${a.t}</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:5px">${a.b}</div>
+            <div style="font-size:11px;font-style:italic;color:var(--ink);border-left:2px solid ${cColor};padding-left:8px">${a.c}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+        <div>
+          <div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid var(--rule)">Pricing orientativo</div>
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr>
+              <th style="text-align:left;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 8px;border-bottom:0.5px solid var(--rule)">Formato</th>
+              <th style="text-align:left;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 8px;border-bottom:0.5px solid var(--rule)">Precio</th>
+              <th style="text-align:left;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 8px;border-bottom:0.5px solid var(--rule)">Margen / Info</th>
+            </tr></thead>
+            <tbody>
+              ${canal.pricing.map(p=>`<tr>
+                <td style="font-size:12px;padding:7px 8px;border-bottom:0.5px solid var(--rule);color:var(--muted)">${p.ch}</td>
+                <td style="font-size:13px;font-weight:500;padding:7px 8px;border-bottom:0.5px solid var(--rule)">${p.p}</td>
+                <td style="font-size:11px;padding:7px 8px;border-bottom:0.5px solid var(--rule);color:${cColor}">${p.m}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+          <div style="margin-top:10px;padding:10px;background:${cBg};border-radius:var(--radius-sm);font-size:12px;color:var(--muted)">
+            <strong style="color:var(--ink)">Condiciones:</strong> ${canal.condiciones}
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid var(--rule)">Objeciones y respuestas</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${canal.objeciones.map(o=>`
+            <div style="padding:8px 10px;border:0.5px solid var(--rule);border-radius:var(--radius-sm);background:var(--surface)">
+              <div style="font-size:12px;font-weight:500;font-style:italic;color:var(--muted);margin-bottom:3px">${o.q}</div>
+              <div style="font-size:12px;color:var(--ink);line-height:1.45">${o.a}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--rule)">Ficha técnica del producto</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        ${[['Ingredientes',prod.ingredientes],['Formato',prod.formato],['Conservación',prod.conservacion],['Caducidad',prod.caducidad],['Alérgenos',prod.alergenos],['Fabricación',prod.fab==='propia'?'Propia · Truficas del Río Pilas':'Externa · Trufa de Truficas'],['Origen trufa',prod.origen],['Temporada',prod.temporada]].map(([k,v])=>`
+        <div style="padding:8px 10px;background:var(--surface2);border-radius:var(--radius-sm)">
+          <div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:3px">${k}</div>
+          <div style="font-size:12px;color:var(--ink);line-height:1.4">${v}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+// ═══════════════════════════════════════════
+// STOCK
+// ═══════════════════════════════════════════
+function renderStock(){
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn btn-gold no-print" onclick="syncQBS()">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115 0M20 15a9 9 0 01-15 0"/>
+      </svg>
+      Sincronizar QBS
+    </button>`;
+
+  const low = state.stock.filter(s=>s.cantidad<=s.minimo && s.cantidad>0);
+  const critical = state.stock.filter(s=>s.cantidad===0);
+  const ok = state.stock.filter(s=>s.cantidad>s.minimo);
+
+  document.getElementById('content').innerHTML = `
+  <div class="grid-3 mb-4">
+    <div class="metric">
+      <div class="metric-label">En stock correcto</div>
+      <div class="metric-value" style="color:var(--gm)">${ok.length}</div>
+      <div class="metric-sub">Referencias sobre mínimo</div>
+    </div>
+    <div class="metric" style="${low.length>0?'border-color:#e8d090':''}">
+      <div class="metric-label">Stock bajo</div>
+      <div class="metric-value" style="${low.length>0?'color:var(--amber)':'color:var(--muted)'}">${low.length}</div>
+      <div class="metric-sub">Por debajo del mínimo</div>
+    </div>
+    <div class="metric" style="${critical.length>0?'border-color:#f0c0bc':''}">
+      <div class="metric-label">Sin stock</div>
+      <div class="metric-value" style="${critical.length>0?'color:var(--red)':'color:var(--muted)'}">${critical.length}</div>
+      <div class="metric-sub">Agotado</div>
+    </div>
+  </div>
+
+  <!-- QBS connection banner -->
+  <div class="card mb-4" style="border-color:#e8d090;background:var(--amberb)">
+    <div class="card-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px">
+      <div>
+        <div style="font-weight:500;font-size:13px;color:var(--amber)">Conexión con QBS (TrazabilidadQBS) — pendiente</div>
+        <div class="text-sm text-muted mt-2">Cuando dispongas de las credenciales API de QBS, esta sección se sincronizará automáticamente. Los datos actuales son manuales.</div>
+      </div>
+      <button class="btn btn-sm" onclick="showQBSInfo()" style="flex-shrink:0">Configurar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div style="font-weight:500">Inventario por referencia</div>
+      <div class="text-xs text-muted">Actualizado: ${new Date().toLocaleDateString('es-ES')}</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Referencia</th><th>Producto</th><th>Cantidad</th>
+          <th>Mínimo</th><th>Nivel</th><th>Lote</th><th>Caducidad</th><th></th>
+        </tr></thead>
+        <tbody>
+          ${state.stock.map(s=>{
+            const pct = s.minimo>0?Math.min(100,Math.round((s.cantidad/(s.minimo*2))*100)):100;
+            const color = s.cantidad===0?'var(--red)':s.cantidad<=s.minimo?'#B8760A':'var(--gm)';
+            const fillColor = s.cantidad===0?'#C0392B':s.cantidad<=s.minimo?'#C89020':'#2D5A3D';
+            const label = s.cantidad===0?'Sin stock':s.cantidad<=s.minimo?'Bajo':'OK';
+            const cad = s.caducidad ? new Date(s.caducidad).toLocaleDateString('es-ES') : '—';
+            return `<tr>
+              <td class="text-muted text-xs">${s.ref}</td>
+              <td>
+                <div style="font-weight:500">${s.nombre}</div>
+                ${s.notas?`<div class="text-xs" style="color:${color}">${s.notas}</div>`:''}
+              </td>
+              <td style="font-weight:500;font-size:15px">${s.cantidad}</td>
+              <td class="text-muted">${s.minimo}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;min-width:120px">
+                  <div class="stock-bar" style="flex:1">
+                    <div class="stock-bar-fill" style="width:${pct}%;background:${fillColor}"></div>
+                  </div>
+                  <span class="text-xs" style="color:${color};min-width:50px">${label}</span>
+                </div>
+              </td>
+              <td class="text-xs text-muted">${s.lote||'—'}</td>
+              <td class="text-xs text-muted">${cad}</td>
+              <td>
+                <button class="btn btn-sm" onclick="openStockModal('${s.id}')">Editar</button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function openStockModal(id){
+  const s = state.stock.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('stock-id').value = s.id;
+  document.getElementById('s-ref').value = s.ref;
+  document.getElementById('s-nombre').value = s.nombre;
+  document.getElementById('s-cantidad').value = s.cantidad;
+  document.getElementById('s-minimo').value = s.minimo;
+  document.getElementById('s-lote').value = s.lote||'';
+  document.getElementById('s-caducidad').value = s.caducidad||'';
+  document.getElementById('s-notas').value = s.notas||'';
+  document.getElementById('modal-stock').classList.add('open');
+}
+
+function saveStock(){
+  const id = document.getElementById('stock-id').value;
+  const idx = state.stock.findIndex(s=>s.id===id);
+  if(idx<0) return;
+  state.stock[idx].cantidad = parseInt(document.getElementById('s-cantidad').value)||0;
+  state.stock[idx].minimo = parseInt(document.getElementById('s-minimo').value)||0;
+  state.stock[idx].lote = document.getElementById('s-lote').value.trim();
+  state.stock[idx].caducidad = document.getElementById('s-caducidad').value;
+  state.stock[idx].notas = document.getElementById('s-notas').value.trim();
+  saveData();
+  closeModal('modal-stock');
+  renderStock();
+  showToast('Stock actualizado');
+}
+
+function syncQBS(){
+  showToast('QBS: Conexión API pendiente de configurar. Configura las credenciales en Ajustes.','info');
+}
+
+function showQBSInfo(){
+  showView('ajustes', document.querySelectorAll('.sb-item')[4]);
+}
+
+// ═══════════════════════════════════════════
+// AJUSTES
+// ═══════════════════════════════════════════
+function renderAjustes(){
+  document.getElementById('content').innerHTML = `
+  <div style="max-width:600px;display:flex;flex-direction:column;gap:20px">
+
+    <div class="card">
+      <div class="card-header"><div style="font-weight:500">Usuarios del sistema</div>
+        <button class="btn btn-sm btn-primary" onclick="addUser()">+ Añadir usuario</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th></th></tr></thead>
+          <tbody id="users-table">
+            ${state.users.map(u=>`<tr>
+              <td class="text-muted">${u.username}</td>
+              <td style="font-weight:500">${u.name}</td>
+              <td>${u.role==='admin'?'<span class="badge badge-green">Admin</span>':'<span class="badge badge-gray">Editor</span>'}</td>
+              <td>
+                ${u.id!==state.currentUser?.id?`<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">Eliminar</button>`:'<span class="text-xs text-muted">Tú</span>'}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div style="font-weight:500">Cambiar mi contraseña</div></div>
+      <div class="card-body">
+        <div class="form-field">
+          <label>Contraseña actual</label>
+          <input type="password" id="pwd-current" placeholder="••••••••">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Nueva contraseña</label>
+            <input type="password" id="pwd-new" placeholder="••••••••">
+          </div>
+          <div class="form-field">
+            <label>Confirmar</label>
+            <input type="password" id="pwd-confirm" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="changePassword()">Actualizar contraseña</button>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:#e8d090;background:var(--amberb)">
+      <div class="card-header" style="border-color:#e8d090">
+        <div style="font-weight:500;color:var(--amber)">Integración QBS (TrazabilidadQBS)</div>
+        <span class="badge badge-amber">Pendiente</span>
+      </div>
+      <div class="card-body">
+        <div class="text-sm text-muted mb-4">Cuando dispongas de las credenciales REST de QBS, introduce los datos aquí para activar la sincronización automática de stock.</div>
+        <div class="form-field">
+          <label>URL endpoint QBS</label>
+          <input type="url" id="qbs-url" value="${localStorage.getItem('qbs_url')||''}" placeholder="https://api.qbs.es/v1/">
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>API Key / Usuario</label>
+            <input type="text" id="qbs-key" value="${localStorage.getItem('qbs_key')||''}" placeholder="API key o usuario">
+          </div>
+          <div class="form-field">
+            <label>Contraseña / Token</label>
+            <input type="password" id="qbs-token" value="${localStorage.getItem('qbs_token')||''}" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="btn" onclick="saveQBS()">Guardar configuración QBS</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div style="font-weight:500">Datos del sistema</div></div>
+      <div class="card-body">
+        <div class="text-sm text-muted mb-4">Los datos se almacenan en el navegador (localStorage). Usa los botones para exportar o restaurar.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" onclick="exportData()">Exportar datos (JSON)</button>
+          <button class="btn btn-danger" onclick="resetData()">Restaurar datos de ejemplo</button>
+        </div>
+      </div>
+    </div>
+
+  </div>`;
+}
+
+function addUser(){
+  const username = prompt('Nombre de usuario:');
+  if(!username) return;
+  if(state.users.find(u=>u.username===username)){showToast('Usuario ya existe','error');return;}
+  const password = prompt('Contraseña:');
+  if(!password) return;
+  const name = prompt('Nombre visible:') || username;
+  const role = confirm('¿Administrador? (Cancelar = Editor)') ? 'admin':'editor';
+  state.users.push({
+    id:'u'+Date.now(),username,password,name,role,
+    initials:name.substring(0,2).toUpperCase()
+  });
+  saveData(); renderAjustes();
+  showToast('Usuario creado');
+}
+
+function deleteUser(id){
+  if(!confirm('¿Eliminar este usuario?')) return;
+  state.users = state.users.filter(u=>u.id!==id);
+  saveData(); renderAjustes();
+  showToast('Usuario eliminado');
+}
+
+function changePassword(){
+  const cur = document.getElementById('pwd-current').value;
+  const nw = document.getElementById('pwd-new').value;
+  const con = document.getElementById('pwd-confirm').value;
+  const user = state.users.find(u=>u.id===state.currentUser.id);
+  if(!user || user.password!==cur){showToast('Contraseña actual incorrecta','error');return;}
+  if(nw.length<6){showToast('Mínimo 6 caracteres','error');return;}
+  if(nw!==con){showToast('Las contraseñas no coinciden','error');return;}
+  user.password=nw; saveData();
+  showToast('Contraseña actualizada');
+}
+
+function saveQBS(){
+  localStorage.setItem('qbs_url',document.getElementById('qbs-url').value);
+  localStorage.setItem('qbs_key',document.getElementById('qbs-key').value);
+  localStorage.setItem('qbs_token',document.getElementById('qbs-token').value);
+  showToast('Configuración QBS guardada. Pendiente de activar conexión.');
+}
+
+function exportData(){
+  const data = {fichas:state.fichas, stock:state.stock, users:state.users.map(u=>({...u,password:'***'}))};
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'truficas_datos_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+}
+
+function resetData(){
+  if(!confirm('¿Restaurar todos los datos de ejemplo? Se perderán los cambios.')) return;
+  localStorage.removeItem('truf_fichas');
+  localStorage.removeItem('truf_stock');
+  state.fichas = JSON.parse(JSON.stringify(FICHAS_DEFAULT));
+  state.stock = JSON.parse(JSON.stringify(STOCK_DEFAULT));
+  saveData(); renderAjustes();
+  showToast('Datos restaurados');
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error'?'var(--red)':type==='info'?'#2D5A3D':'var(--gd)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+loadState();
+if(state.currentUser){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('sb-username').textContent = state.currentUser.name;
+  document.getElementById('sb-role').textContent = state.currentUser.role==='admin'?'Administrador':'Editor';
+  document.getElementById('sb-avatar').textContent = state.currentUser.initials;
+  showView('dashboard', document.querySelector('.sb-item'));
+}
+</script>
+</body>
+</html>
+HTMLEOF
+echo "done"
